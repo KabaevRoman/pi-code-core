@@ -9,7 +9,9 @@ import { Approvals } from './approvals.ts';
 import { Scheduler } from './scheduler.ts';
 import { loadConfig, type Settings } from './config.ts';
 import { initialState, restore, type WorkflowState } from './state.ts';
-import { canonical, hash, textResult, humanReadable, taskSummary } from './utils.ts';
+import { canonical, hash, textResult, humanReadable } from './utils.ts';
+import { checklistComponent } from './checklist.ts';
+import type { Task } from './state.ts';
 import { PromptPack } from '../extensions/prompts.ts';
 import { Memory } from '../extensions/memory.ts';
 import { Hooks } from '../extensions/hooks.ts';
@@ -61,10 +63,7 @@ export class Runtime {
     if (ctx.hasUI) {
       const tasks = Object.values(this.state.tasks);
       const visible = [...tasks.filter(task => task.status === 'in_progress'), ...tasks.filter(task => task.status === 'pending'), ...tasks.filter(task => task.status === 'completed')].slice(0, 8);
-      ctx.ui.setWidget?.('compat-todos', tasks.length ? [
-        ...taskSummary(visible.map(task => ({...task, description: undefined}))).split('\n').slice(1),
-        `${tasks.filter(task => task.status === 'completed').length}/${tasks.length} completed${tasks.length > visible.length ? ` · ${tasks.length - visible.length} more (TaskList)` : ''}`,
-      ] : undefined);
+      ctx.ui.setWidget?.('compat-todos', tasks.length ? (_tui: any, theme: any) => checklistComponent(theme, visible, { footer: tasks.length > visible.length ? `${tasks.length - visible.length} more (TaskList)` : undefined }) : undefined);
     }
   }
   message(content: string): void { this.pi.sendMessage({ customType: 'claude-compat', content, display: true }); }
@@ -130,6 +129,18 @@ export class Runtime {
         }
       }, signal),
     };
+    if (['TodoWrite', 'TaskCreate', 'TaskUpdate', 'TaskList', 'TaskGet'].includes(name)) {
+      tool.renderCall = (args: any, theme: any) => {
+        const summary = name === 'TodoWrite' ? `${args?.todos?.length ?? 0} items` : typeof args?.taskId === 'string' ? `#${args.taskId}` : typeof args?.subject === 'string' ? args.subject : '';
+        return { render: () => [`${theme.fg('toolTitle', theme.bold(name))}${summary ? ` ${theme.fg('muted', summary)}` : ''}`], invalidate: () => {} };
+      };
+      tool.renderResult = (result: any, options: any, theme: any) => {
+        const tasks: Task[] = result?.details?.tasks ?? (result?.details?.task ? [result.details.task] : []);
+        if (tasks.length) return checklistComponent(theme, tasks, { maxRows: options?.expanded ? undefined : 10 });
+        const text = (result?.content ?? []).filter((block: any) => block.type === 'text').map((block: any) => block.text).join('\n').trim();
+        return { render: () => text ? text.split('\n').map((line: string) => theme.fg('toolOutput', line)) : [], invalidate: () => {} };
+      };
+    }
     this.pi.registerTool(tool);
   }
   artifact(kind: string): string { return join(this.store, kind, randomUUID()); }
