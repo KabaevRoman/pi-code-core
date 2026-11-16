@@ -49,16 +49,36 @@ export async function matchesRule(rule: string, name: string, input: Record<stri
   }
   if (name === 'Bash') {
     // Deliberately support exact commands only. Prefix/compound syntax needs a shell parser.
+    const variants = commandVariants(String(input.command ?? ''), cwd);
     if (pattern.endsWith(':*')) {
-      const tokens = shellWords(String(input.command ?? ''));
       const prefix = shellWords(pattern.slice(0,-2));
-      if (!tokens || !prefix) return kind !== 'allow';
-      return tokens.length >= prefix.length && prefix.every((word,index)=>tokens[index]===word);
+      if (!prefix) return kind !== 'allow';
+      const parsed = variants.map(command => shellWords(command));
+      if (!parsed.some(tokens => tokens)) return kind !== 'allow';
+      return parsed.some(tokens => !!tokens && tokens.length >= prefix.length && prefix.every((word,index)=>tokens[index]===word));
     }
     if (pattern.includes('*') || pattern.includes(':')) return kind !== 'allow';
-    return input.command === pattern;
+    return variants.includes(pattern);
   }
   return kind !== 'allow';
+}
+
+// Bash always starts in cwd, so `cd <cwd> && command` is equivalent to `command`.
+// Dropping that no-op prefix keeps prefix rules and session approvals working.
+export function withoutRedundantCd(command: string, cwd: string): string | undefined {
+  const match = /^\s*cd\s+([^\r\n]+?)\s*&&\s*([^\r\n]*)$/.exec(command);
+  if (!match) return;
+  const words = shellWords(`cd ${match[1]}`);
+  if (!words || words.length !== 2 || words[0] !== 'cd') return;
+  if (resolve(cwd, words[1]) !== resolve(cwd)) return;
+  return match[2].trim() || undefined;
+}
+
+function commandVariants(command: string, cwd: string): string[] {
+  const variants = [command];
+  let next = withoutRedundantCd(command, cwd);
+  while (next && !variants.includes(next)) { variants.push(next); next = withoutRedundantCd(next, cwd); }
+  return variants;
 }
 
 // Classify a simple shell invocation only; compound syntax and expansion never get prefix approval.

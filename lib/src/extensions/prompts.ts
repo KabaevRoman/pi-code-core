@@ -33,6 +33,7 @@ export class PromptPack {
       'Help the user complete software engineering tasks. Read relevant code before editing. Make focused changes and verify the resulting behavior. Report outcomes truthfully and concisely.',
       this.fragment('system-prompt-system-section.md'),
       `Working directory: ${cwd}\nAvailable tools: ${tools.join(', ')}. Only claim capabilities of these tools.`,
+      'Shell calls already start in the working directory. Run commands directly instead of prefixing `cd <working directory> &&`; use a `cd <relative path>` prefix only when a command must run elsewhere.',
       'This profile uses an incomplete pinned prompt pack. Subagents, hosted services, background jobs, and OS sandboxing are unavailable.',
       memory,
     ].filter(Boolean).join('\n\n');

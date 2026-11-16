@@ -62,8 +62,8 @@ export class Runtime {
     ctx.ui.setStatus('code-compat', `CC ${this.state.mode} · ${Object.values(this.state.tasks).filter(t => t.status !== 'completed').length} tasks`);
     if (ctx.hasUI) {
       const tasks = Object.values(this.state.tasks);
-      const visible = [...tasks.filter(task => task.status === 'in_progress'), ...tasks.filter(task => task.status === 'pending'), ...tasks.filter(task => task.status === 'completed')].slice(0, 8);
-      ctx.ui.setWidget?.('compat-todos', tasks.length ? (_tui: any, theme: any) => checklistComponent(theme, visible, { footer: tasks.length > visible.length ? `${tasks.length - visible.length} more (TaskList)` : undefined }) : undefined);
+      const ordered = [...tasks.filter(task => task.status === 'in_progress'), ...tasks.filter(task => task.status === 'pending'), ...tasks.filter(task => task.status === 'completed')];
+      ctx.ui.setWidget?.('compat-todos', tasks.length ? (_tui: any, theme: any) => checklistComponent(theme, ordered, { maxRows: 8 }) : undefined);
     }
   }
   message(content: string): void { this.pi.sendMessage({ customType: 'code-compat', content, display: true }); }

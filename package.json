@@ -1,6 +1,6 @@
 {
   "name": "@kabaevroman/pi-code-core",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Shared runtime for independently installable pi extensions",
   "type": "module",
   "files": [
