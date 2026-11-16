@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { cp, mkdtemp, mkdir, rm, symlink } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -14,7 +16,10 @@ test('separately installed core copies share one runtime and register each featu
       await cp(join(root, name), join(temp, name), { recursive: true });
     }
     await mkdir(join(temp, 'node_modules'));
-    const typebox = fileURLToPath(new URL('../../node_modules/typebox', import.meta.url));
+    const typebox = createRequire(import.meta.url).resolve.paths('typebox')
+      .map(directory => join(directory, 'typebox'))
+      .find(existsSync);
+    assert.ok(typebox, 'typebox must be installed for the copied core');
     await symlink(typebox, join(temp, 'node_modules/typebox'), 'dir');
     const other = await import(pathToFileURL(join(temp, 'dist/features/shared.js')).href);
     const listeners = new Map();
