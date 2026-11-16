@@ -2,7 +2,7 @@
 
 Each extension remains a separate Git repository and independently installable pi package. `core/` is the shared `pi-code-core` dependency. The root workspace is local development scaffolding, not a published package.
 
-All packages use version `0.5.0`. Package names are now `pi-code-context`, `pi-code-file-tools`, `pi-code-hooks`, `pi-code-integrations`, `pi-code-project-memory`, `pi-code-permissions`, `pi-code-planning`, `pi-code-prompts-skills`, `pi-code-session-ui`, `pi-code-subagents`, and `pi-code-tasks`.
+All packages use version `0.5.0`. Package names are now `pi-code-context`, `pi-code-file-tools`, `pi-code-hooks`, `pi-code-integrations`, `pi-code-mem`, `pi-code-permissions`, `pi-code-planning`, `pi-code-prompts-skills`, `pi-code-session-ui`, `pi-code-subagents`, and `pi-code-tasks`.
 
 ## Local development
 
@@ -21,7 +21,7 @@ The workspace resolves `pi-code-core` locally. Rebuild core after editing its so
 
 Every extension that uses the runtime declares a regular dependency on `pi-code-core@0.5.0`.  No extension depends on another extension.
 
-Registry names were checked before this release. The memory extension uses `pi-code-project-memory` because `pi-code-memory` is already owned by another publisher.
+Registry names were checked before this release. The memory extension uses `pi-code-mem` because `pi-code-memory` is already owned by another publisher.
 
 Publish core first, then the extensions, then `pi-code-bundle`. `npm pack` / `npm publish` in core runs its build automatically. Each extension can then be packaged or published from its own repository without the workspace or sibling repositories. Users installing one extension receive core through its dependency.
 
