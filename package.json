@@ -1,5 +1,5 @@
 {
-  "name": "pi-code-core",
+  "name": "@kabaevroman/pi-code-core",
   "version": "0.5.0",
   "description": "Shared runtime for independently installable pi extensions",
   "type": "module",
@@ -97,7 +97,6 @@
     "url": "git+https://github.com/KabaevRoman/pi-code-core.git"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://npm.pkg.github.com"
   }
 }
