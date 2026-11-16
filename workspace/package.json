@@ -13,7 +13,8 @@
     "integrations",
     "hooks",
     "prompts-skills",
-    "file-tools"
+    "file-tools",
+    "bundle"
   ],
   "scripts": {
     "build": "npm run build --workspace pi-code-core",

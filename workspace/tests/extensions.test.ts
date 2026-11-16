@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { harness } from '../tasks/tests/helper.ts';
 
 const names = ['context', 'file-tools', 'hooks', 'integrations', 'memory', 'permissions', 'planning', 'prompts-skills', 'session-ui', 'subagents', 'tasks'];
-for (const name of names.filter(name => name !== 'integrations')) {
+for (const name of names) {
   test(`${name} installs independently`, async () => {
     const { default: install } = await import(`../${name}/index.ts`);
     const h = await harness(install);
@@ -30,7 +30,7 @@ test('all extensions coexist without repeated registration', async () => {
   const installs = await Promise.all(names.map(async name => (await import(`../${name}/index.ts`)).default));
   const h = await harness(pi => { for (const install of installs) install(pi); });
   try {
-    assert.equal(h.runtime.modularFeatures.size, 11);
+    assert.equal(h.runtime.modularFeatures.size, 12);
     assert.ok(h.tools.has('Read'));
     assert.ok(h.tools.has('TaskCreate'));
     assert.ok(h.tools.has('EnterPlanMode'));

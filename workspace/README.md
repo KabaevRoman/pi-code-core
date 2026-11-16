@@ -19,11 +19,11 @@ The workspace resolves `pi-code-core` locally. Rebuild core after editing its so
 
 ## Independent installation and release
 
-Every extension that uses the runtime declares a regular dependency on `pi-code-core@0.5.0`. `pi-code-integrations` is currently a standalone status command and needs no core dependency. No extension depends on another extension.
+Every extension that uses the runtime declares a regular dependency on `pi-code-core@0.5.0`.  No extension depends on another extension.
 
 Registry names were checked before this release. The memory extension uses `pi-code-project-memory` because `pi-code-memory` is already owned by another publisher.
 
-Publish core first, then the extensions. `npm pack` / `npm publish` in core runs its build automatically. Each extension can then be packaged or published from its own repository without the workspace or sibling repositories. Users installing one extension receive core through its dependency.
+Publish core first, then the extensions, then `pi-code-bundle`. `npm pack` / `npm publish` in core runs its build automatically. Each extension can then be packaged or published from its own repository without the workspace or sibling repositories. Users installing one extension receive core through its dependency.
 
 For an unpublished local distribution, build and pack core, pack the desired extension, and install both tarballs in the target project. Example from this workspace:
 
@@ -44,3 +44,7 @@ A Git installation of an extension also needs the declared core version to be av
 The session event bus coordinates runtime sharing across physical copies of core. Registering the same feature again is ignored. Prompt files are stored once in core; prompt injection remains owned by `pi-code-prompts-skills`.
 
 The old `pi-claude-*` package names are replaced, but existing `claude-compat:*` session keys, settings locations, and compatibility profile identifiers are retained to preserve stored state and behavior. Claude remains in the upstream prompt provenance because those assets came from a Claude Code compatibility profile; renaming the npm packages does not change their origin or rewrite their contents.
+
+## Full bundle
+
+`bundle/` contains `pi-code-bundle`, which installs and activates all 11 extensions. It depends on the individual packages and carries no copied source or prompt pack. Individual and bundled installations can coexist without duplicate registration. After publication, install with `pi install npm:pi-code-bundle`.
