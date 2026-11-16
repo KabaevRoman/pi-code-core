@@ -7,3 +7,16 @@ Build with `npm run build`. `npm pack` and `npm publish` build automatically. Th
 The root export provides `acquire(pi, feature)` and `shared(pi)`. These coordinate one runtime through pi's session event bus, including when multiple physical copies of this library are installed. Internal helpers have explicit package exports grouped under `runtime`, `extensions`, and `backends`; their contracts are versioned with core. Extensions pin the same exact core version.
 
 Prompt assets retain their provenance in `lib/prompts/NOTICE.md`. Existing compatibility/session identifiers are intentionally retained to preserve user data.
+
+## Multi-repository workspace
+
+The `workspace/` directory preserves the development workspace manifest, documentation, and cross-extension tests. With all package repositories checked out as siblings and this repository named `core`, restore the workspace files from the parent directory:
+
+```sh
+cp -R core/workspace/. .
+npm install
+npm test
+npm run typecheck
+```
+
+These workspace files are not shipped in the npm library.

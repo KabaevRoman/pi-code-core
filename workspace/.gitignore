@@ -1,0 +1,17 @@
+node_modules/
+*.tgz
+.DS_Store
+
+# Independently versioned package repositories
+/context/
+/core/
+/file-tools/
+/hooks/
+/integrations/
+/memory/
+/permissions/
+/planning/
+/prompts-skills/
+/session-ui/
+/subagents/
+/tasks/

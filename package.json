@@ -91,5 +91,13 @@
   "devDependencies": {
     "typescript": "5.9.3",
     "@types/node": "22.19.19"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KabaevRoman/pi-code-core.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

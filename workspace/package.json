@@ -1,0 +1,24 @@
+{
+  "name": "pi-extensions-workspace",
+  "private": true,
+  "workspaces": [
+    "core",
+    "tasks",
+    "subagents",
+    "context",
+    "memory",
+    "session-ui",
+    "planning",
+    "permissions",
+    "integrations",
+    "hooks",
+    "prompts-skills",
+    "file-tools"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace pi-code-core",
+    "test": "npm run build && npm run test --workspaces --if-present && node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "npm run build && npm run typecheck --workspaces --if-present"
+  },
+  "type": "module"
+}
