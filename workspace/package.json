@@ -17,7 +17,7 @@
     "bundle"
   ],
   "scripts": {
-    "build": "npm run build --workspace @kabaevroman/pi-code-core",
+    "build": "npm run build --workspace @pi-ko/core",
     "test": "npm run build && npm run test --workspaces --if-present && node --experimental-strip-types --test tests/*.test.ts",
     "typecheck": "npm run build && npm run typecheck --workspaces --if-present"
   },
