@@ -1,0 +1,95 @@
+{
+  "name": "pi-code-core",
+  "version": "0.5.0",
+  "description": "Shared runtime for independently installable pi extensions",
+  "type": "module",
+  "files": [
+    "dist",
+    "lib/prompts",
+    "lib/profiles"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/features/shared.d.ts",
+      "import": "./dist/features/shared.js"
+    },
+    "./runtime/state": {
+      "types": "./dist/runtime/state.d.ts",
+      "import": "./dist/runtime/state.js"
+    },
+    "./runtime/scheduler": {
+      "types": "./dist/runtime/scheduler.d.ts",
+      "import": "./dist/runtime/scheduler.js"
+    },
+    "./runtime/capabilities": {
+      "types": "./dist/runtime/capabilities.d.ts",
+      "import": "./dist/runtime/capabilities.js"
+    },
+    "./runtime/utils": {
+      "types": "./dist/runtime/utils.d.ts",
+      "import": "./dist/runtime/utils.js"
+    },
+    "./runtime/runtime": {
+      "types": "./dist/runtime/runtime.d.ts",
+      "import": "./dist/runtime/runtime.js"
+    },
+    "./runtime/events": {
+      "types": "./dist/runtime/events.d.ts",
+      "import": "./dist/runtime/events.js"
+    },
+    "./runtime/approvals": {
+      "types": "./dist/runtime/approvals.d.ts",
+      "import": "./dist/runtime/approvals.js"
+    },
+    "./runtime/config": {
+      "types": "./dist/runtime/config.d.ts",
+      "import": "./dist/runtime/config.js"
+    },
+    "./extensions/permissions": {
+      "types": "./dist/extensions/permissions.d.ts",
+      "import": "./dist/extensions/permissions.js"
+    },
+    "./extensions/prompts": {
+      "types": "./dist/extensions/prompts.d.ts",
+      "import": "./dist/extensions/prompts.js"
+    },
+    "./extensions/memory": {
+      "types": "./dist/extensions/memory.d.ts",
+      "import": "./dist/extensions/memory.js"
+    },
+    "./extensions/hooks": {
+      "types": "./dist/extensions/hooks.d.ts",
+      "import": "./dist/extensions/hooks.js"
+    },
+    "./extensions/checkpoints": {
+      "types": "./dist/extensions/checkpoints.d.ts",
+      "import": "./dist/extensions/checkpoints.js"
+    },
+    "./backends/process": {
+      "types": "./dist/backends/process.d.ts",
+      "import": "./dist/backends/process.js"
+    },
+    "./features/shared": {
+      "types": "./dist/features/shared.d.ts",
+      "import": "./dist/features/shared.js"
+    },
+    "./runtime/schema": {
+      "types": "./dist/runtime/schema.d.ts",
+      "import": "./dist/runtime/schema.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "npm run build",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "1.5.2",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "22.19.19"
+  }
+}
