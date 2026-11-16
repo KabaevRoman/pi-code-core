@@ -25,3 +25,29 @@ export async function optionalText(file: string): Promise<string | undefined> {
 }
 export function abort(signal?: AbortSignal): void { signal?.throwIfAborted(); }
 export const textResult = (text: string, details: Record<string, unknown> = {}) => ({ content: [{ type: 'text' as const, text }], details });
+
+/** Readable display for structured diagnostics and approval inputs. */
+export function humanReadable(value: unknown, indent = ''): string {
+  if (value === null || value === undefined) return 'None';
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if (typeof value !== 'object') return String(value);
+  const entries = Array.isArray(value) ? value.map((item, index) => [String(index + 1), item] as const) : Object.entries(value);
+  if (!entries.length) return 'None';
+  return entries.map(([key, item]) => {
+    const label = key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
+    return item !== null && typeof item === 'object'
+      ? `${indent}${label}:\n${humanReadable(item, indent + '  ')}`
+      : `${indent}${label}: ${humanReadable(item)}`;
+  }).join('\n');
+}
+export function taskSummary(tasks: {id: string; subject: string; status: string; blockedBy: string[]; owner?: string; description?: string}[]): string {
+  if (!tasks.length) return 'No tasks.';
+  const completed = tasks.filter(task => task.status === 'completed').length;
+  return [`Tasks — ${completed}/${tasks.length} completed`, ...tasks.map(task => {
+    const marker = task.status === 'completed' ? '✓' : task.status === 'in_progress' ? '→' : '○';
+    return `${marker} #${task.id} ${task.subject} (${task.status.replace(/_/g, ' ')})${task.owner ? ` · ${task.owner}` : ''}${task.blockedBy.length ? ` · dependencies: ${task.blockedBy.map(id => '#' + id).join(', ')}` : ''}${task.description && task.description !== task.subject ? `\n  ${task.description}` : ''}`;
+  })].join('\n');
+}
+export function agentSummary(report: {id?: string; role?: string; status: string; turns?: number; output?: string; error?: string}): string {
+  return [`${report.role ?? 'Subagent'} — ${report.status.replace(/_/g, ' ')}`, report.id ? `Agent ID: ${report.id}` : '', report.turns !== undefined ? `Turns: ${report.turns}` : '', report.error ? `Error: ${report.error}` : '', report.output || ''].filter(Boolean).join('\n');
+}

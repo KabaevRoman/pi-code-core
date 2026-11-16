@@ -9,7 +9,7 @@ import { Approvals } from './approvals.ts';
 import { Scheduler } from './scheduler.ts';
 import { loadConfig, type Settings } from './config.ts';
 import { initialState, restore, type WorkflowState } from './state.ts';
-import { canonical, hash, textResult } from './utils.ts';
+import { canonical, hash, textResult, humanReadable, taskSummary } from './utils.ts';
 import { PromptPack } from '../extensions/prompts.ts';
 import { Memory } from '../extensions/memory.ts';
 import { Hooks } from '../extensions/hooks.ts';
@@ -30,6 +30,7 @@ export class Runtime {
   cwd = '';
   store = '';
   ready = false;
+  private uiContext?: ExtensionContext;
   constructor(pi: ExtensionAPI) { this.pi = pi; }
   async start(ctx: ExtensionContext): Promise<void> {
     this.ready = false; this.cwd = ctx.cwd;
@@ -53,8 +54,19 @@ export class Runtime {
     this.ready = true; this.status(ctx);
   }
   async reload(ctx: ExtensionContext): Promise<void> { this.config = await loadConfig(ctx.cwd, ctx.isProjectTrusted()); }
-  persist(): void { this.pi.appendEntry('claude-compat:state', structuredClone(this.state)); }
-  status(ctx: ExtensionContext): void { ctx.ui.setStatus('claude-compat', `CC ${this.state.mode} · ${Object.values(this.state.tasks).filter(t => t.status !== 'completed').length} tasks`); }
+  persist(): void { this.pi.appendEntry('claude-compat:state', structuredClone(this.state)); if (this.uiContext) this.status(this.uiContext); }
+  status(ctx: ExtensionContext): void {
+    this.uiContext = ctx;
+    ctx.ui.setStatus('claude-compat', `CC ${this.state.mode} · ${Object.values(this.state.tasks).filter(t => t.status !== 'completed').length} tasks`);
+    if (ctx.hasUI) {
+      const tasks = Object.values(this.state.tasks);
+      const visible = [...tasks.filter(task => task.status === 'in_progress'), ...tasks.filter(task => task.status === 'pending'), ...tasks.filter(task => task.status === 'completed')].slice(0, 8);
+      ctx.ui.setWidget?.('compat-todos', tasks.length ? [
+        ...taskSummary(visible.map(task => ({...task, description: undefined}))).split('\n').slice(1),
+        `${tasks.filter(task => task.status === 'completed').length}/${tasks.length} completed${tasks.length > visible.length ? ` · ${tasks.length - visible.length} more (TaskList)` : ''}`,
+      ] : undefined);
+    }
+  }
   message(content: string): void { this.pi.sendMessage({ customType: 'claude-compat', content, display: true }); }
   register(schema: TSchema, name: string, description: string, write: boolean, backend: (input: any, ctx: ExtensionContext, signal?: AbortSignal) => Promise<ReturnType<typeof textResult>>): void {
     this.tools.add(name);
@@ -98,7 +110,7 @@ export class Runtime {
           }
           const policyFingerprint = JSON.stringify(this.config.permissions);
           if (decision.action === 'deny') throw new Error(decision.reason);
-          if (decision.action === 'ask' && !await this.approvals.request(ctx, `${name}: ${decision.reason}`, JSON.stringify(input), signal)) throw new Error('Permission denied or approval UI unavailable');
+          if (decision.action === 'ask' && !await this.approvals.request(ctx, `${name}: ${decision.reason}`, humanReadable(input), signal)) throw new Error('Permission denied or approval UI unavailable');
           signal?.throwIfAborted();
           await this.reload(ctx);
           if (policyFingerprint !== JSON.stringify(this.config.permissions)) throw new Error('Permissions changed during approval; retry the tool');
