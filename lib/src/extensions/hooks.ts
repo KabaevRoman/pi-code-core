@@ -53,7 +53,7 @@ export function registerStopHook(runtime: Runtime): void {
     const result = await runtime.hooks.run('Stop', { stop_hook_active: stopActive }, runtime.config, ctx.cwd, ctx.signal);
     if ((result.continueReason || result.deny) && !stopActive) {
       stopActive = true;
-      return { continue: true, entries: [{ type: 'custom_message' as const, customType: 'claude-compat:stop', content: result.continueReason ?? result.deny!, display: false }] };
+      return { continue: true, entries: [{ type: 'custom_message' as const, customType: 'code-compat:stop', content: result.continueReason ?? result.deny!, display: false }] };
     }
   });
   runtime.pi.on('agent_settled', () => { stopActive = false; });

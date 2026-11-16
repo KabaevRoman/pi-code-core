@@ -3,7 +3,7 @@ import { Runtime } from '../runtime/runtime.ts';
 export type Feature = string;
 interface Shared { runtime: Runtime; features: Set<Feature> }
 // ExtensionAPI event facades differ, but all deliver through the same session bus.
-const channel = 'pi-claude-compat:runtime:v2';
+const channel = 'pi-code-compat:runtime:v2';
 export function shared(pi: ExtensionAPI): Shared {
   let state: Shared | undefined;
   pi.events.emit(channel,{accept:(value:Shared)=>{state=value;}});

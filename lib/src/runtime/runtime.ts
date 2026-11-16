@@ -38,7 +38,7 @@ export class Runtime {
     this.ready = false; this.cwd = ctx.cwd;
     this.state = restore(ctx.sessionManager.getBranch());
     this.readVersions.clear();
-    this.store = join(homedir(), '.local/share/pi-claude-compat', hash(ctx.cwd).slice(0,24), hash(ctx.sessionManager.getSessionId()).slice(0,24));
+    this.store = join(homedir(), '.local/share/pi-code-compat', hash(ctx.cwd).slice(0,24), hash(ctx.sessionManager.getSessionId()).slice(0,24));
     await this.reload(ctx);
     if (!this.modular) {
     const ownPath = await canonical(fileURLToPath(new URL('../index.ts', import.meta.url)));
@@ -48,7 +48,7 @@ export class Runtime {
       if (!tool || ![ownPath, await canonical(fileURLToPath(new URL('../strict.ts', import.meta.url)))].includes(await canonical(tool.sourceInfo.path))) throw new Error(`Tool ownership conflict: ${name}. Disable the conflicting extension.`);
     }
     }
-    if (!ctx.sessionManager.getBranch().some((e: any) => e.customType === 'claude-compat:state')) this.state.mode = this.config.permissions.defaultMode ?? 'default';
+    if (!ctx.sessionManager.getBranch().some((e: any) => e.customType === 'code-compat:state')) this.state.mode = this.config.permissions.defaultMode ?? 'default';
     if (!this.modular) await this.memory.load(ctx.cwd);
     if (!this.modular) this.pi.setActiveTools([...this.tools]);
     const startup = await this.hooks.run('SessionStart', { source: 'startup', session_id: ctx.sessionManager.getSessionId() }, this.config, this.cwd, ctx.signal);
@@ -56,17 +56,17 @@ export class Runtime {
     this.ready = true; this.status(ctx);
   }
   async reload(ctx: ExtensionContext): Promise<void> { this.config = await loadConfig(ctx.cwd, ctx.isProjectTrusted()); }
-  persist(): void { this.pi.appendEntry('claude-compat:state', structuredClone(this.state)); if (this.uiContext) this.status(this.uiContext); }
+  persist(): void { this.pi.appendEntry('code-compat:state', structuredClone(this.state)); if (this.uiContext) this.status(this.uiContext); }
   status(ctx: ExtensionContext): void {
     this.uiContext = ctx;
-    ctx.ui.setStatus('claude-compat', `CC ${this.state.mode} · ${Object.values(this.state.tasks).filter(t => t.status !== 'completed').length} tasks`);
+    ctx.ui.setStatus('code-compat', `CC ${this.state.mode} · ${Object.values(this.state.tasks).filter(t => t.status !== 'completed').length} tasks`);
     if (ctx.hasUI) {
       const tasks = Object.values(this.state.tasks);
       const visible = [...tasks.filter(task => task.status === 'in_progress'), ...tasks.filter(task => task.status === 'pending'), ...tasks.filter(task => task.status === 'completed')].slice(0, 8);
       ctx.ui.setWidget?.('compat-todos', tasks.length ? (_tui: any, theme: any) => checklistComponent(theme, visible, { footer: tasks.length > visible.length ? `${tasks.length - visible.length} more (TaskList)` : undefined }) : undefined);
     }
   }
-  message(content: string): void { this.pi.sendMessage({ customType: 'claude-compat', content, display: true }); }
+  message(content: string): void { this.pi.sendMessage({ customType: 'code-compat', content, display: true }); }
   register(schema: TSchema, name: string, description: string, write: boolean, backend: (input: any, ctx: ExtensionContext, signal?: AbortSignal) => Promise<ReturnType<typeof textResult>>): void {
     this.tools.add(name);
     const tool: ToolDefinition<any, any> = {

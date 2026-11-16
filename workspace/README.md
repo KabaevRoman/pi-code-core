@@ -43,7 +43,7 @@ A Git installation of an extension also needs the declared core version to be av
 
 The session event bus coordinates runtime sharing across physical copies of core. Registering the same feature again is ignored. Prompt files are stored once in core; prompt injection remains owned by `@kabaevroman/pi-code-prompts-skills`.
 
-The old `pi-claude-*` package names are replaced, but existing `claude-compat:*` session keys, settings locations, and compatibility profile identifiers are retained to preserve stored state and behavior. Claude remains in the upstream prompt provenance because those assets came from a Claude Code compatibility profile; renaming the npm packages does not change their origin or rewrite their contents.
+The old `pi-claude-*` package names are replaced, and session keys, channel identifiers, and the data store now use `code-compat` / `pi-code-compat` naming. Settings locations (`.claude/settings.json`, `CLAUDE.md` memory files, `CLAUDE_PROJECT_DIR`) are unchanged so existing on-disk configuration keeps working. Upstream prompt provenance is retained in `lib/prompts` (NOTICE.md, manifest.json, source-tree.json, and the `original/` fragments) because those assets are reproduced from an external prompt-inventory project; renaming the npm packages does not change their origin or rewrite their contents.
 
 ## Full bundle
 

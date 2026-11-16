@@ -12,6 +12,6 @@ export interface WorkflowState {
 export const initialState = (): WorkflowState => ({ version: 1, mode: 'default', tasks: {}, nextTask: 1, checkpoints: [] });
 export function restore(entries: readonly any[]): WorkflowState {
   let state = initialState();
-  for (const entry of entries) if (entry.type === 'custom' && entry.customType === 'claude-compat:state' && entry.data?.version === 1) state = structuredClone(entry.data);
+  for (const entry of entries) if (entry.type === 'custom' && entry.customType === 'code-compat:state' && entry.data?.version === 1) state = structuredClone(entry.data);
   return state;
 }

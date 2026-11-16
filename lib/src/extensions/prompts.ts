@@ -29,7 +29,7 @@ export class PromptPack {
   }
   system(model: string, cwd: string, tools: string[], memory: string): string {
     return [
-      `You are a coding assistant running in pi with a Claude Code ${profile.target} compatibility profile. Actual model: ${model}.`,
+      `You are a coding assistant running in pi with a code ${profile.target} compatibility profile. Actual model: ${model}.`,
       'Help the user complete software engineering tasks. Read relevant code before editing. Make focused changes and verify the resulting behavior. Report outcomes truthfully and concisely.',
       this.fragment('system-prompt-system-section.md'),
       `Working directory: ${cwd}\nAvailable tools: ${tools.join(', ')}. Only claim capabilities of these tools.`,
