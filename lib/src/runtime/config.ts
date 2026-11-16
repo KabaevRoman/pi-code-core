@@ -1,8 +1,8 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { optionalText } from './utils.ts';
-export type Mode = 'default' | 'acceptEdits' | 'plan' | 'dontAsk' | 'bypassPermissions';
-export const modes: Mode[] = ['default', 'acceptEdits', 'plan', 'dontAsk', 'bypassPermissions'];
+export type Mode = 'safe' | 'ask' | 'fullAccess' | 'default' | 'acceptEdits' | 'plan' | 'dontAsk' | 'bypassPermissions';
+export const modes: Mode[] = ['safe', 'ask', 'fullAccess', 'default', 'acceptEdits', 'plan', 'dontAsk', 'bypassPermissions'];
 export interface Settings {
   permissions: { allow: string[]; ask: string[]; deny: string[]; defaultMode?: Mode };
   hooks: Record<string, HookGroup[]>;

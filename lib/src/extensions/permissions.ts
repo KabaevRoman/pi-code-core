@@ -15,6 +15,12 @@ export async function decide(name: string, input: Record<string, any>, mode: Mod
   if (mode === 'plan' && !readAgent && !readonly.has(name) && !workflow.has(name)) {
     if (!(name === 'Write' || name === 'Edit' || name === 'NotebookEdit') || !file || file !== planPath) return { action: 'deny', reason: 'Plan mode permits only reads, workflow tools and the designated plan artifact. Shell and alternate tools are blocked.' };
   }
+  if (mode === 'ask' || mode === 'fullAccess') {
+    for (const rule of config.permissions.deny) {
+      if (await matchesRule(rule, name, input, cwd, file, 'deny') || (originalName !== name && await matchesRule(rule, originalName, input, cwd, file, 'deny'))) return { action: 'deny', reason: `deny rule: ${rule}` };
+    }
+    return mode === 'ask' ? { action: 'ask', reason: 'Ask Everything mode requires approval for every call' } : { action: 'allow', reason: 'Full Access mode' };
+  }
   for (const kind of ['deny','ask','allow'] as const) for (const rule of config.permissions[kind]) {
     if (await matchesRule(rule, name, input, cwd, file, kind) || (originalName!==name && await matchesRule(rule, originalName, input, cwd, file, kind))) return { action: kind === 'deny' || (kind === 'ask' && mode === 'dontAsk') ? 'deny' : kind === 'ask' ? 'ask' : 'allow', reason: `${kind} rule: ${rule}` };
   }
